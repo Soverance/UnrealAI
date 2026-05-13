@@ -4,6 +4,9 @@
 #include "MCP/MCPParamValidator.h"
 #include "UnrealClaudeModule.h"
 #include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/World.h"
+#include "Engine/Level.h"
+#include "Engine/LevelScriptBlueprint.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/CompilerResultsLog.h"
@@ -21,27 +24,48 @@ UBlueprint* FBlueprintLoader::LoadBlueprint(const FString& BlueprintPath, FStrin
 		return nullptr;
 	}
 
-	// Try to load the Blueprint directly
-	UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *BlueprintPath);
-
-	// If not found, try with /Game/ prefix
-	if (!Blueprint)
+	// Normalize path: prepend /Game/ if missing
+	FString NormalizedPath = BlueprintPath;
+	if (!NormalizedPath.StartsWith(TEXT("/")))
 	{
-		FString AdjustedPath = BlueprintPath;
-		if (!AdjustedPath.StartsWith(TEXT("/")))
-		{
-			AdjustedPath = TEXT("/Game/") + AdjustedPath;
-		}
-		Blueprint = LoadObject<UBlueprint>(nullptr, *AdjustedPath);
+		NormalizedPath = TEXT("/Game/") + NormalizedPath;
 	}
 
-	if (!Blueprint)
+	// 1) Try as a standalone UBlueprint asset (original behavior)
+	UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *BlueprintPath);
+	if (!Blueprint && NormalizedPath != BlueprintPath)
 	{
-		OutError = FString::Printf(TEXT("Could not load Blueprint: %s"), *BlueprintPath);
+		Blueprint = LoadObject<UBlueprint>(nullptr, *NormalizedPath);
+	}
+	if (Blueprint)
+	{
+		return Blueprint;
+	}
+
+	// 2) Fall back to UWorld -> PersistentLevel -> LevelScriptBlueprint.
+	//    Level blueprints live inside .umap files, not as standalone UBlueprint assets,
+	//    so LoadObject<UBlueprint> above always misses them.
+	UWorld* World = LoadObject<UWorld>(nullptr, *BlueprintPath);
+	if (!World && NormalizedPath != BlueprintPath)
+	{
+		World = LoadObject<UWorld>(nullptr, *NormalizedPath);
+	}
+	if (World && World->PersistentLevel)
+	{
+		// bDontCreate = true: never create a level blueprint as a side effect of a query
+		Blueprint = World->PersistentLevel->GetLevelScriptBlueprint(true);
+		if (Blueprint)
+		{
+			return Blueprint;
+		}
+		OutError = FString::Printf(
+			TEXT("World '%s' has no level blueprint (open the level and add nodes to create one)"),
+			*BlueprintPath);
 		return nullptr;
 	}
 
-	return Blueprint;
+	OutError = FString::Printf(TEXT("Could not load Blueprint: %s"), *BlueprintPath);
+	return nullptr;
 }
 
 bool FBlueprintLoader::ValidateBlueprintPath(const FString& BlueprintPath, FString& OutError)

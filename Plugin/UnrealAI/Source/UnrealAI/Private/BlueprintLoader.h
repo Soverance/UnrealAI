@@ -69,8 +69,11 @@ class FBlueprintLoader
 {
 public:
 	/**
-	 * Load a Blueprint asset from path
-	 * @param BlueprintPath - Asset path (e.g., "/Game/Blueprints/BP_Actor")
+	 * Load a Blueprint asset from path.
+	 * Handles standalone Blueprint assets and level blueprints inside .umap files:
+	 *   - "/Game/Blueprints/BP_Actor"   -> standalone UBlueprint
+	 *   - "/Game/Maps/Main/Ethereal"    -> level blueprint (via UWorld->PersistentLevel)
+	 * @param BlueprintPath - Asset path
 	 * @param OutError - Error message if loading fails
 	 * @return Loaded Blueprint or nullptr
 	 */

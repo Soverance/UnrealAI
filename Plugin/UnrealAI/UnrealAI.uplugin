@@ -15,7 +15,7 @@
 	"IsExperimentalVersion": false,
 	"Installed": false,
 	"EnabledByDefault": true,
-	"EngineVersion": "5.6.0",
+	"EngineVersion": "5.7.0",
 	"SupportedTargetPlatforms": [ "Win64", "Linux" ],
 	"Modules": [
 		{

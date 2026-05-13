@@ -84,23 +84,37 @@ check_python() {
     # py (Windows Python Launcher) is most reliable — never triggers Store stub
     if command -v py &> /dev/null 2>&1 && py --version &> /dev/null 2>&1; then
         echo "py"
-    elif command -v python3 &> /dev/null 2>&1; then
-        echo "python3"
-    elif command -v python &> /dev/null 2>&1; then
-        echo "python"
-    else
-        # Windows: search common install locations when nothing is in PATH
-        for p in \
-            "/c/Users/$USER/AppData/Local/Programs/Python/Python3"*/python.exe \
-            "/c/Python3"*/python.exe \
-            "/c/Program Files/Python3"*/python.exe; do
-            if [[ -f "$p" ]] 2>/dev/null; then
-                echo "$p"
-                return
-            fi
-        done
-        echo ""
+        return
     fi
+    # UE-bundled Python 3 — reliable on any machine with UE installed
+    for ue_py in \
+        "/c/Program Files/Epic Games/UE_5.7/Engine/Binaries/ThirdParty/Python3/Win64/python.exe" \
+        "/c/Program Files/Epic Games/UE_5.6/Engine/Binaries/ThirdParty/Python3/Win64/python.exe"; do
+        if [[ -f "$ue_py" ]]; then
+            echo "$ue_py"
+            return
+        fi
+    done
+    # python3 — verify it actually runs (catches the Microsoft Store stub which is on PATH but fails)
+    if command -v python3 &> /dev/null 2>&1 && python3 --version &> /dev/null 2>&1; then
+        echo "python3"
+        return
+    fi
+    if command -v python &> /dev/null 2>&1 && python --version &> /dev/null 2>&1; then
+        echo "python"
+        return
+    fi
+    # Windows: search common install locations when nothing is in PATH
+    for p in \
+        "/c/Users/$USER/AppData/Local/Programs/Python/Python3"*/python.exe \
+        "/c/Python3"*/python.exe \
+        "/c/Program Files/Python3"*/python.exe; do
+        if [[ -f "$p" ]] 2>/dev/null; then
+            echo "$p"
+            return
+        fi
+    done
+    echo ""
 }
 
 cmd_list() {
