@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "ue-llm-toolkit": {
+    "unreal-ai": {
       "command": "node",
       "args": ["${PLUGIN_DIR}/Resources/mcp-bridge/index.js"],
       "env": {

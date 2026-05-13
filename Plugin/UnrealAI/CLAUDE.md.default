@@ -1,6 +1,6 @@
-# UE LLM Toolkit - Claude Code Instructions for Unreal Engine 5.7
+# Unreal AI - Claude Code Instructions for Unreal Engine 5.7
 
-This file provides guidance to Claude Code when working with the UE LLM Toolkit plugin and Unreal Engine 5.7 projects.
+This file provides guidance to Claude Code when working with the Unreal AI plugin and Unreal Engine 5.7 projects.
 
 ## Setup
 
@@ -8,25 +8,25 @@ Copy this file to `CLAUDE.md` in the same directory and customize the build path
 
 ## Project Overview
 
-**UE LLM Toolkit** is an Unreal Engine 5.7 plugin that provides an HTTP REST API for LLM-driven editor automation — 38 tools, 201 operations for Blueprint editing, animation, materials, level management, and more.
+**Unreal AI** is an Unreal Engine 5.7 plugin that provides an HTTP REST API for LLM-driven editor automation — 38 tools, 201 operations for Blueprint editing, animation, materials, level management, and more.
 
 ### Key Directories
-- `Source/UELLMToolkit/Private/MCP/` - HTTP server and tool implementations
-- `Source/UELLMToolkit/Private/MCP/Tools/` - Individual tool classes
-- `Source/UELLMToolkit/Private/Tests/` - Automation tests
+- `Source/UnrealAI/Private/MCP/` - HTTP server and tool implementations
+- `Source/UnrealAI/Private/MCP/Tools/` - Individual tool classes
+- `Source/UnrealAI/Private/Tests/` - Automation tests
 - `Resources/mcp-bridge/` - Node.js MCP bridge
 
 ### Build Commands
 ```bash
 # Build plugin - customize these paths for your system:
 # - UE_PATH: Your Unreal Engine installation
-# - PLUGIN_PATH: Path to UELLMToolkit.uplugin
+# - PLUGIN_PATH: Path to UnrealAI.uplugin
 # - OUTPUT_PATH: Temporary build output directory
 
-"<UE_PATH>/Engine/Build/BatchFiles/RunUAT.bat" BuildPlugin -Plugin="<PLUGIN_PATH>/UELLMToolkit.uplugin" -Package="<OUTPUT_PATH>" -TargetPlatforms=Win64 -Rocket
+"<UE_PATH>/Engine/Build/BatchFiles/RunUAT.bat" BuildPlugin -Plugin="<PLUGIN_PATH>/UnrealAI.uplugin" -Package="<OUTPUT_PATH>" -TargetPlatforms=Win64 -Rocket
 
 # Run tests (in Unreal Editor console)
-Automation RunTests UELLMToolkit
+Automation RunTests UnrealAI
 ```
 
 ---
@@ -155,7 +155,7 @@ See `Resources/domains/meta.md` for full loading instructions and the task-to-do
 When the user says `prep one time init`, read the full procedure at:
 
 ```
-Plugins/UELLMToolkit/Resources/prep-init-guide.md
+Plugins/UnrealAI/Resources/prep-init-guide.md
 ```
 
 Follow it step by step. The guide covers: discovery scans, player character detection, deep inspection heuristics, output templates for 4 domain files (code.md, blueprints.md, assets.md, debug.md), scaling rules for large projects, and error handling. Do not improvise — the guide is self-contained.
@@ -164,7 +164,7 @@ Follow it step by step. The guide covers: discovery scans, player character dete
 
 When the user says `prep <domain>` (e.g., `prep code`, `prep blueprints + debug`), load the matching domain files:
 
-1. **Plugin domain** (general UE 5.7 patterns): `Plugins/UELLMToolkit/Resources/domains/<domain>.md`
+1. **Plugin domain** (general UE 5.7 patterns): `Plugins/UnrealAI/Resources/domains/<domain>.md`
 2. **Project domain** (project-specific): `domains/<domain>.md`
 
 Read both if they exist (plugin first, then project). For combined preps like `prep X + Y`, load all requested domains.
@@ -177,7 +177,7 @@ Read both if they exist (plugin first, then project). For combined preps like `p
 ```cpp
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FMyTest,
-    "UELLMToolkit.Category.TestName",
+    "UnrealAI.Category.TestName",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter
 )
 

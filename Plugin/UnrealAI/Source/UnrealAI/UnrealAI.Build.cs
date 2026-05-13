@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class UELLMToolkit : ModuleRules
+public class UnrealAI : ModuleRules
 {
-	public UELLMToolkit(ReadOnlyTargetRules Target) : base(Target)
+	public UnrealAI(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		bUseUnity = false; // UE 5.7: UserWidget.h + EnhancedInputComponent.h FOnInputAction redefinition in unity builds

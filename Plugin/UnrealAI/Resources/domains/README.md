@@ -1,4 +1,4 @@
-# UE LLM Toolkit — Domain Knowledge System
+# Unreal AI — Domain Knowledge System
 
 Operational knowledge for working effectively with UE 5.7 projects through the plugin.
 
@@ -63,4 +63,4 @@ Tell your AI:
 prep one time init
 ```
 
-The LLM reads the scan procedure from `Plugins/UELLMToolkit/Resources/prep-init-guide.md` and follows it — exploring your project with plugin tools and writing 4 domain files (code, blueprints, assets, debug) to `domains/` in your project root. Requires the editor running with the plugin loaded. Re-run after major project changes. See `domains/meta.md` for details.
+The LLM reads the scan procedure from `Plugins/UnrealAI/Resources/prep-init-guide.md` and follows it — exploring your project with plugin tools and writing 4 domain files (code, blueprints, assets, debug) to `domains/` in your project root. Requires the editor running with the plugin loaded. Re-run after major project changes. See `domains/meta.md` for details.

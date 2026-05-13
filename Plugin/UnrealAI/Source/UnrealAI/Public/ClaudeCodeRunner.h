@@ -13,7 +13,7 @@
  * Executes 'claude -p' in print mode and captures output
  * Implements IClaudeRunner interface for abstraction
  */
-class UELLMTOOLKIT_API FClaudeCodeRunner : public IClaudeRunner, public FRunnable
+class UNREALAI_API FClaudeCodeRunner : public IClaudeRunner, public FRunnable
 {
 public:
 	FClaudeCodeRunner();

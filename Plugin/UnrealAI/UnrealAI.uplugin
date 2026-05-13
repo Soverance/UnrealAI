@@ -2,12 +2,12 @@
 	"FileVersion": 3,
 	"Version": 2,
 	"VersionName": "1.1.0",
-	"FriendlyName": "UE LLM Toolkit",
+	"FriendlyName": "Unreal AI",
 	"Description": "HTTP REST API plugin for LLM-driven Unreal Engine editor automation. 38 tools, 201 operations — Blueprint editing, animation, materials, level management, and more.",
 	"Category": "Editor",
 	"CreatedBy": "Natali Caggiano",
 	"CreatedByURL": "https://github.com/Natfii",
-	"DocsURL": "https://github.com/ColtonWilley/ue-llm-toolkit",
+	"DocsURL": "https://github.com/Soverance/UnrealAI",
 	"MarketplaceURL": "",
 	"SupportURL": "",
 	"CanContainContent": false,
@@ -19,7 +19,7 @@
 	"SupportedTargetPlatforms": [ "Win64", "Linux" ],
 	"Modules": [
 		{
-			"Name": "UELLMToolkit",
+			"Name": "UnrealAI",
 			"Type": "Editor",
 			"LoadingPhase": "PostEngineInit",
 			"PlatformAllowList": [ "Win64", "Linux" ]

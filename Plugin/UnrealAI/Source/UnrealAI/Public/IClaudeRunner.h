@@ -34,7 +34,7 @@ enum class EClaudeStreamEventType : uint8
  * Structured event parsed from Claude CLI stream-json NDJSON output.
  * Each NDJSON line becomes one of these events.
  */
-struct UELLMTOOLKIT_API FClaudeStreamEvent
+struct UNREALAI_API FClaudeStreamEvent
 {
 	/** Event type */
 	EClaudeStreamEventType Type = EClaudeStreamEventType::Unknown;
@@ -82,7 +82,7 @@ DECLARE_DELEGATE_OneParam(FOnClaudeStreamEvent, const FClaudeStreamEvent& /*Even
 /**
  * Configuration for Claude Code CLI execution
  */
-struct UELLMTOOLKIT_API FClaudeRequestConfig
+struct UNREALAI_API FClaudeRequestConfig
 {
 	/** The prompt to send to Claude */
 	FString Prompt;
@@ -116,7 +116,7 @@ struct UELLMTOOLKIT_API FClaudeRequestConfig
  * Abstract interface for Claude Code CLI runners
  * Allows for different implementations (real, mock, cached, etc.)
  */
-class UELLMTOOLKIT_API IClaudeRunner
+class UNREALAI_API IClaudeRunner
 {
 public:
 	virtual ~IClaudeRunner() = default;

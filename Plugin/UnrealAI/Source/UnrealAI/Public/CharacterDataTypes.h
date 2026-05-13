@@ -12,7 +12,7 @@
  * Used with UDataTable for configurable character attributes
  */
 USTRUCT(BlueprintType)
-struct UELLMTOOLKIT_API FCharacterStatsRow : public FTableRowBase
+struct UNREALAI_API FCharacterStatsRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
@@ -80,7 +80,7 @@ struct UELLMTOOLKIT_API FCharacterStatsRow : public FTableRowBase
  * Contains base stats, mesh/animation references, and gameplay settings
  */
 UCLASS(BlueprintType)
-class UELLMTOOLKIT_API UCharacterConfigDataAsset : public UDataAsset
+class UNREALAI_API UCharacterConfigDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
 

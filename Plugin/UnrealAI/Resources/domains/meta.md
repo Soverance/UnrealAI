@@ -36,7 +36,7 @@ Load both when needed. They don't overlap.
 
 ## Project-Specific Domains
 
-Run `prep one time init` to generate project domain files. The LLM reads the full procedure from `Plugins/UELLMToolkit/Resources/prep-init-guide.md` and follows it — scanning your project with plugin tools and writing 4 concise domain files to `domains/` in your project root:
+Run `prep one time init` to generate project domain files. The LLM reads the full procedure from `Plugins/UnrealAI/Resources/prep-init-guide.md` and follows it — scanning your project with plugin tools and writing 4 concise domain files to `domains/` in your project root:
 
 - **code.md** — class hierarchy, module structure, export macro, key headers
 - **blueprints.md** — player AnimBP deep-dive, BP inventory, blend spaces

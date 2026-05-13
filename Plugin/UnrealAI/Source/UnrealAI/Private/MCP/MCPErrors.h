@@ -192,7 +192,7 @@ public:
 
 	static FMCPToolResult EditorNotAvailable()
 	{
-		return FMCPToolResult::Error(TEXT("Editor not available. Is the Unreal Editor running with UELLMToolkit plugin loaded?"));
+		return FMCPToolResult::Error(TEXT("Editor not available. Is the Unreal Editor running with UnrealAI plugin loaded?"));
 	}
 
 	static FMCPToolResult NoActiveWorld()

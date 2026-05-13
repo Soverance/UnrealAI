@@ -1,4 +1,4 @@
-# Contributing to UE LLM Toolkit
+# Contributing to Unreal AI
 
 ## Adding a New Tool
 
@@ -6,7 +6,7 @@ Every tool in the plugin follows the same pattern. Here's how to add one.
 
 ### 1. Create the Tool Header
 
-Create a new file in `Plugin/UELLMToolkit/Source/UELLMToolkit/Private/MCP/Tools/`:
+Create a new file in `Plugin/UnrealAI/Source/UnrealAI/Private/MCP/Tools/`:
 
 ```cpp
 // MCPTool_MyNewTool.h

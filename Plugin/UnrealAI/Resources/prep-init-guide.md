@@ -275,7 +275,7 @@ Each scan step is independent. A failure in one does not abort the rest.
 | No Enhanced Input | debug.md notes "No Enhanced Input actions found" |
 | No skeletons found | assets.md notes "No skeletons found" |
 | Can't identify player | List candidates, note "Could not auto-detect player character" |
-| Plugin not responding | **Stop entirely.** Tell the user: "Plugin not responding — make sure the editor is running with UELLMToolkit loaded." |
+| Plugin not responding | **Stop entirely.** Tell the user: "Plugin not responding — make sure the editor is running with UnrealAI loaded." |
 
 ---
 

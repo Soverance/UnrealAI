@@ -8,7 +8,7 @@
  * Manages Claude conversation session persistence and history
  * Single responsibility: session storage and retrieval
  */
-class UELLMTOOLKIT_API FClaudeSessionManager
+class UNREALAI_API FClaudeSessionManager
 {
 public:
 	FClaudeSessionManager();

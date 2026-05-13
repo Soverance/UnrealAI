@@ -1,4 +1,4 @@
-# UE LLM Toolkit
+# Unreal AI
 
 **Give your AI the ability to actually *see inside* your Unreal project.**
 
@@ -6,7 +6,7 @@ A pure C++ plugin that exposes **37 tools** and **200+ operations** over HTTP, g
 
 This is **not** a "prompt-to-game" tool. It won't generate a forest or build you a castle from a sentence. This is a **debugging, analysis, and productivity tool** for developers who are already building something in Unreal and want an AI that can actually help — one that can read their Blueprint graphs, trace their animation state machines, inspect their montage notifies, and understand what their project is doing well enough to be useful.
 
-> Forked from [Natfii/UnrealClaude](https://github.com/Natfii/UnrealClaude) by [Natali Caggiano](https://github.com/Natfii) and significantly extended.
+> Forked from [ColtonWilley/ue-llm-toolkit](https://github.com/ColtonWilley/ue-llm-toolkit), itself a fork of [Natfii/UnrealClaude](https://github.com/Natfii/UnrealClaude) by [Natali Caggiano](https://github.com/Natfii).
 
 ## Features
 
@@ -33,12 +33,12 @@ This is **not** a "prompt-to-game" tool. It won't generate a forest or build you
 
 ## Install
 
-Copy `Plugin/UELLMToolkit/` and `Scripts/` into your project:
+Copy `Plugin/UnrealAI/` and `Scripts/` into your project:
 
 ```
 YourProject/
   Plugins/
-    UELLMToolkit/     <-- copy Plugin/UELLMToolkit/ here
+    UnrealAI/     <-- copy Plugin/UnrealAI/ here
   Scripts/
     ue-tool.sh        <-- copy Scripts/ here
     build.sh
@@ -63,7 +63,7 @@ Unreal is too large and complex for an LLM to hold everything it needs in contex
 
 **One-time setup** (requires editor running with plugin loaded):
 
-1. Copy `Plugins/UELLMToolkit/CLAUDE.md.default` to `CLAUDE.md` in your project root
+1. Copy `Plugins/UnrealAI/CLAUDE.md.default` to `CLAUDE.md` in your project root
 2. Tell your AI:
 ```
 prep one time init
@@ -254,7 +254,7 @@ bash Scripts/ue-tool.sh --port 3001 call asset_search '{"search_term":"Hero"}'
 For MCP-native clients (Claude Desktop, etc.), a Node.js bridge is included:
 
 ```bash
-cd Plugin/UELLMToolkit/Resources/mcp-bridge
+cd Plugin/UnrealAI/Resources/mcp-bridge
 npm install
 node index.js
 ```
@@ -306,8 +306,8 @@ Use `bash Scripts/ue-tool.sh help <tool_name>` for full parameter docs. Quick in
 ## Architecture
 
 ```
-Plugin/UELLMToolkit/
-  Source/UELLMToolkit/
+Plugin/UnrealAI/
+  Source/UnrealAI/
     Private/
       MCP/                    # HTTP server + tool registry
         Tools/                # Tool implementations (MCPTool_*.h/.cpp)
@@ -354,3 +354,5 @@ If you're on an older version and want to try porting, the tool pattern itself i
 ## Credits
 
 - **Original plugin**: [Natali Caggiano](https://github.com/Natfii) — [UnrealClaude](https://github.com/Natfii/UnrealClaude)
+- **HTTP toolkit fork**: [Colton Willey](https://github.com/ColtonWilley) — [ue-llm-toolkit](https://github.com/ColtonWilley/ue-llm-toolkit) (rebuilt as an HTTP REST API with 37 tools / 200+ operations)
+- **This fork**: [Soverance](https://github.com/Soverance) — [UnrealAI](https://github.com/Soverance/UnrealAI)

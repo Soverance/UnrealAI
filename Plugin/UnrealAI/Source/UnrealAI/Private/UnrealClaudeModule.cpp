@@ -183,12 +183,12 @@ void FUnrealClaudeModule::ShutdownModule()
 
 FUnrealClaudeModule& FUnrealClaudeModule::Get()
 {
-	return FModuleManager::LoadModuleChecked<FUnrealClaudeModule>("UELLMToolkit");
+	return FModuleManager::LoadModuleChecked<FUnrealClaudeModule>("UnrealAI");
 }
 
 bool FUnrealClaudeModule::IsAvailable()
 {
-	return FModuleManager::Get().IsModuleLoaded("UELLMToolkit");
+	return FModuleManager::Get().IsModuleLoaded("UnrealAI");
 }
 
 void FUnrealClaudeModule::RegisterMenus()
@@ -281,4 +281,4 @@ uint32 FUnrealClaudeModule::GetMCPServerPort()
 
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE(FUnrealClaudeModule, UELLMToolkit)
+IMPLEMENT_MODULE(FUnrealClaudeModule, UnrealAI)

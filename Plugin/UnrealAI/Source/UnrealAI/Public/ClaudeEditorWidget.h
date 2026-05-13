@@ -32,7 +32,7 @@ public:
 /**
  * Main Claude chat widget for the editor
  */
-class UELLMTOOLKIT_API SClaudeEditorWidget : public SCompoundWidget
+class UNREALAI_API SClaudeEditorWidget : public SCompoundWidget
 {
 public:
 	SLATE_BEGIN_ARGS(SClaudeEditorWidget)

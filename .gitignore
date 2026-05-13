@@ -1,6 +1,6 @@
 # UE build artifacts
-Plugin/UELLMToolkit/Binaries/
-Plugin/UELLMToolkit/Intermediate/
+Plugin/UnrealAI/Binaries/
+Plugin/UnrealAI/Intermediate/
 *.sln
 *.vcxproj
 *.vcxproj.filters
@@ -12,8 +12,8 @@ Plugin/UELLMToolkit/Intermediate/
 *.user
 
 # Node modules (MCP bridge)
-Plugin/UELLMToolkit/Resources/mcp-bridge/node_modules/
-Plugin/UELLMToolkit/Resources/mcp-bridge/.env
+Plugin/UnrealAI/Resources/mcp-bridge/node_modules/
+Plugin/UnrealAI/Resources/mcp-bridge/.env
 
 # OS files
 Thumbs.db
