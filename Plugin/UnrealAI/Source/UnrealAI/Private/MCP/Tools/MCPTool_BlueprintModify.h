@@ -20,6 +20,7 @@
  *   - add_node: Add a single node to a graph
  *   - add_nodes: Batch add multiple nodes with connections
  *   - delete_node: Remove a node from a graph
+ *   - rename_custom_event: Set the CustomFunctionName on a K2Node_CustomEvent (fixes cleared-name migration artifacts)
  *
  * Level 4 Operations (Connections):
  *   - connect_pins: Connect two pins
@@ -54,7 +55,7 @@ public:
 			"Create and modify Blueprints programmatically. Auto-compiles after changes.\n\n"
 			"Complexity Levels:\n"
 			"Level 2 (Structure): 'create', 'reparent', 'add_variable', 'remove_variable', 'add_function', 'remove_function'\n"
-			"Level 3 (Nodes): 'add_node', 'add_nodes' (batch), 'delete_node'\n"
+			"Level 3 (Nodes): 'add_node', 'add_nodes' (batch), 'delete_node', 'rename_custom_event'\n"
 			"Level 4 (Wiring): 'connect_pins', 'disconnect_pins', 'set_pin_value'\n"
 			"Level 5 (Defaults): 'set_component_default' - set default property on BP component, 'set_cdo_default' - set top-level CDO property, 'add_component' - add component to BP, 'remove_component' - remove BP-added (SCS) component\n"
 			"Level 6 (Debug): 'add_debug_print' - add labeled debug print subgraph, 'remove_debug_print' - remove by label\n"
@@ -139,6 +140,10 @@ public:
 			FMCPToolParameter(TEXT("pin_value"), TEXT("string"),
 				TEXT("Default value to set"), false),
 
+			// For rename_custom_event operation
+			FMCPToolParameter(TEXT("new_name"), TEXT("string"),
+				TEXT("New CustomFunctionName for rename_custom_event (target node must be a K2Node_CustomEvent)"), false),
+
 			// For add_component operation
 			FMCPToolParameter(TEXT("component_class"), TEXT("string"),
 				TEXT("For 'add_component': component class (e.g., 'StaticMeshComponent', 'SkeletalMeshComponent')"), false),
@@ -204,6 +209,7 @@ private:
 	FMCPToolResult ExecuteAddNode(const TSharedRef<FJsonObject>& Params);
 	FMCPToolResult ExecuteAddNodes(const TSharedRef<FJsonObject>& Params);
 	FMCPToolResult ExecuteDeleteNode(const TSharedRef<FJsonObject>& Params);
+	FMCPToolResult ExecuteRenameCustomEvent(const TSharedRef<FJsonObject>& Params);
 
 	// Level 4 Operations (Connections)
 	FMCPToolResult ExecuteConnectPins(const TSharedRef<FJsonObject>& Params);

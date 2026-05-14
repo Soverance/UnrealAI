@@ -16,6 +16,7 @@
 #include "UObject/UnrealType.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Kismet2/BlueprintEditorUtils.h"
+#include "K2Node_CustomEvent.h"
 
 // Operation name constants
 namespace BlueprintModifyOps
@@ -29,6 +30,7 @@ namespace BlueprintModifyOps
 	static const FString AddNode = TEXT("add_node");
 	static const FString AddNodes = TEXT("add_nodes");
 	static const FString DeleteNode = TEXT("delete_node");
+	static const FString RenameCustomEvent = TEXT("rename_custom_event");
 	static const FString ConnectPins = TEXT("connect_pins");
 	static const FString DisconnectPins = TEXT("disconnect_pins");
 	static const FString SetPinValue = TEXT("set_pin_value");
@@ -112,6 +114,10 @@ FMCPToolResult FMCPTool_BlueprintModify::Execute(const TSharedRef<FJsonObject>& 
 	{
 		return ExecuteDeleteNode(Params);
 	}
+	if (Operation == BlueprintModifyOps::RenameCustomEvent)
+	{
+		return ExecuteRenameCustomEvent(Params);
+	}
 	// Level 4: Connection Operations
 	if (Operation == BlueprintModifyOps::ConnectPins)
 	{
@@ -171,6 +177,7 @@ FMCPToolResult FMCPTool_BlueprintModify::Execute(const TSharedRef<FJsonObject>& 
 		BlueprintModifyOps::AddVariable, BlueprintModifyOps::RemoveVariable,
 		BlueprintModifyOps::AddFunction, BlueprintModifyOps::RemoveFunction,
 		BlueprintModifyOps::AddNode, BlueprintModifyOps::AddNodes, BlueprintModifyOps::DeleteNode,
+		BlueprintModifyOps::RenameCustomEvent,
 		BlueprintModifyOps::ConnectPins, BlueprintModifyOps::DisconnectPins, BlueprintModifyOps::SetPinValue,
 		BlueprintModifyOps::SetComponentDefault, BlueprintModifyOps::SetCDODefault,
 		BlueprintModifyOps::AddComponent, BlueprintModifyOps::RemoveComponent,
@@ -854,6 +861,80 @@ FMCPToolResult FMCPTool_BlueprintModify::ExecuteDeleteNode(const TSharedRef<FJso
 
 	return FMCPToolResult::Success(
 		FString::Printf(TEXT("Deleted node '%s'"), *NodeId),
+		ResultData
+	);
+}
+
+FMCPToolResult FMCPTool_BlueprintModify::ExecuteRenameCustomEvent(const TSharedRef<FJsonObject>& Params)
+{
+	TOptional<FMCPToolResult> Error;
+	FString NodeId;
+	if (!ExtractRequiredString(Params, TEXT("node_id"), NodeId, Error))
+	{
+		return Error.GetValue();
+	}
+
+	FString NewName;
+	if (!ExtractRequiredString(Params, TEXT("new_name"), NewName, Error))
+	{
+		return Error.GetValue();
+	}
+
+	NewName = NewName.TrimStartAndEnd();
+	if (NewName.IsEmpty())
+	{
+		return FMCPToolResult::Error(TEXT("new_name cannot be empty"));
+	}
+
+	FString GraphName = ExtractOptionalString(Params, TEXT("graph_name"), TEXT(""));
+	bool bFunctionGraph = ExtractOptionalBool(Params, TEXT("is_function_graph"), false);
+
+	FMCPBlueprintLoadContext Context;
+	if (auto LoadError = Context.LoadAndValidate(Params))
+	{
+		return LoadError.GetValue();
+	}
+
+	FString GraphError;
+	UEdGraph* Graph = FBlueprintUtils::FindGraph(Context.Blueprint, GraphName, bFunctionGraph, GraphError);
+	if (!Graph)
+	{
+		return FMCPToolResult::Error(GraphError);
+	}
+
+	UEdGraphNode* Node = FBlueprintUtils::FindNodeById(Graph, NodeId);
+	if (!Node)
+	{
+		return FMCPToolResult::Error(FString::Printf(TEXT("Node '%s' not found"), *NodeId));
+	}
+
+	UK2Node_CustomEvent* CustomEvent = Cast<UK2Node_CustomEvent>(Node);
+	if (!CustomEvent)
+	{
+		return FMCPToolResult::Error(FString::Printf(
+			TEXT("Node '%s' is not a CustomEvent (class: %s)"),
+			*NodeId, *Node->GetClass()->GetName()));
+	}
+
+	const FString OldName = CustomEvent->CustomFunctionName.ToString();
+
+	CustomEvent->Modify();
+	CustomEvent->CustomFunctionName = FName(*NewName);
+	CustomEvent->ReconstructNode();
+
+	if (auto CompileError = Context.CompileAndFinalize(TEXT("CustomEvent renamed")))
+	{
+		return CompileError.GetValue();
+	}
+
+	TSharedPtr<FJsonObject> ResultData = Context.BuildResultJson();
+	ResultData->SetStringField(TEXT("node_id"), NodeId);
+	ResultData->SetStringField(TEXT("old_name"), OldName);
+	ResultData->SetStringField(TEXT("new_name"), NewName);
+
+	return FMCPToolResult::Success(
+		FString::Printf(TEXT("Renamed CustomEvent '%s' from '%s' to '%s'"),
+			*NodeId, *OldName, *NewName),
 		ResultData
 	);
 }

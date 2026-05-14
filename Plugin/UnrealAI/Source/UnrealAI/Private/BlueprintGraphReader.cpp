@@ -255,18 +255,20 @@ FString FBlueprintGraphReader::GetNodeLabel(UEdGraphNode* Node)
 
 FString FBlueprintGraphReader::GetK2NodeLabel(UEdGraphNode* Node)
 {
+	// Custom Event (check first: UK2Node_CustomEvent derives from UK2Node_Event,
+	// so the general Event check would otherwise swallow CustomEvent and read its
+	// empty EventReference instead of CustomFunctionName).
+	if (UK2Node_CustomEvent* Custom = Cast<UK2Node_CustomEvent>(Node))
+	{
+		FName FuncName = Custom->CustomFunctionName;
+		return FString::Printf(TEXT("CustomEvent: %s"), *FuncName.ToString());
+	}
+
 	// Event
 	if (UK2Node_Event* Event = Cast<UK2Node_Event>(Node))
 	{
 		FName EventName = Event->EventReference.GetMemberName();
 		return FString::Printf(TEXT("Event: %s"), *EventName.ToString());
-	}
-
-	// Custom Event
-	if (UK2Node_CustomEvent* Custom = Cast<UK2Node_CustomEvent>(Node))
-	{
-		FName FuncName = Custom->CustomFunctionName;
-		return FString::Printf(TEXT("CustomEvent: %s"), *FuncName.ToString());
 	}
 
 	// Function Entry
@@ -1074,15 +1076,17 @@ void FBlueprintGraphReader::DeriveK2NodeTypeAndContext(UEdGraphNode* Node, FStri
 	OutNodeType = TEXT("Node");
 	OutContext = FString();
 
-	if (UK2Node_Event* Event = Cast<UK2Node_Event>(Node))
-	{
-		OutNodeType = TEXT("Event");
-		OutContext = Event->EventReference.GetMemberName().ToString();
-	}
-	else if (UK2Node_CustomEvent* Custom = Cast<UK2Node_CustomEvent>(Node))
+	// CustomEvent first: it derives from UK2Node_Event and would otherwise be
+	// caught by the generic Event branch with an empty EventReference.
+	if (UK2Node_CustomEvent* Custom = Cast<UK2Node_CustomEvent>(Node))
 	{
 		OutNodeType = TEXT("CustomEvent");
 		OutContext = Custom->CustomFunctionName.ToString();
+	}
+	else if (UK2Node_Event* Event = Cast<UK2Node_Event>(Node))
+	{
+		OutNodeType = TEXT("Event");
+		OutContext = Event->EventReference.GetMemberName().ToString();
 	}
 	else if (UK2Node_FunctionEntry* FuncEntry = Cast<UK2Node_FunctionEntry>(Node))
 	{

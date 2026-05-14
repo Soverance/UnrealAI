@@ -1,12 +1,23 @@
 # Unreal AI
 
-**Give your AI the ability to actually *see inside* your Unreal project.**
+**A development partner *inside* your Unreal Engine 5 project.**
 
 A pure C++ plugin that exposes **37 tools** and **200+ operations** over HTTP, giving LLMs read/write access to major editor subsystems. Drop it into any UE 5.7 project and get a `localhost` REST API that works with [Claude Code](https://claude.ai/claude-code), Cursor, Windsurf, or any HTTP client. No Python runtime in the editor. No MCP lock-in. Just HTTP + JSON.
 
 This is **not** a "prompt-to-game" tool. It won't generate a forest or build you a castle from a sentence. This is a **debugging, analysis, and productivity tool** for developers who are already building something in Unreal and want an AI that can actually help — one that can read their Blueprint graphs, trace their animation state machines, inspect their montage notifies, and understand what their project is doing well enough to be useful.
 
 > Forked from [ColtonWilley/ue-llm-toolkit](https://github.com/ColtonWilley/ue-llm-toolkit), itself a fork of [Natfii/UnrealClaude](https://github.com/Natfii/UnrealClaude) by [Natali Caggiano](https://github.com/Natfii).
+>
+> **Status: standalone.** This repository has been detached from the upstream fork tree and is no longer a GitHub fork — we can't open pull requests back to `ColtonWilley/ue-llm-toolkit` or `Natfii/UnrealClaude`. UnrealAI develops independently from here on. Upstream work in the parent repos isn't automatically tracked; cherry-picks would have to be done by hand.
+
+## Changes in This Fork
+
+Beyond renaming the plugin (UELLMToolkit → UnrealAI), this fork adds:
+
+- **PowerShell CLI wrapper** (`Scripts/ue-tool.ps1`) — Windows-native equivalent of `ue-tool.sh` with no Python dependency. Same `call` / `help` / `list` / `save` / `status` commands; uses `Invoke-RestMethod` and `ConvertFrom-Json` directly. See the [CLI Wrapper](#cli-wrapper--ue-toolsh--ue-toolps1) section.
+- **Level Blueprint support** in `blueprint_query` / `blueprint_modify` — `BlueprintLoader` now resolves `.umap` paths (e.g. `/Game/Maps/Main/MyLevel`) to the persistent-level blueprint via `UWorld->PersistentLevel`. Lets you walk and modify level blueprint event graphs the same way you would standalone Blueprint assets — useful for fixing migration artifacts like disconnected exec pins on `StartCameraFade` calls or orphan widget references that survived UE4 → UE5.
+- **`rename_custom_event` operation** on `blueprint_modify` — programmatically sets `CustomFunctionName` on a `K2Node_CustomEvent`. Required params: `blueprint_path`, `node_id`, `new_name`. Compiles automatically. Useful for genuine cleared-name cases or deliberate renames without opening the BP editor.
+- **Bug fix: CustomEvent labels in `BlueprintGraphReader`.** `Cast<UK2Node_Event>` was checked before `Cast<UK2Node_CustomEvent>`. Since `UK2Node_CustomEvent` derives from `UK2Node_Event`, all CustomEvent nodes fell into the `Event` branch and were rendered as `"Event: None"` (the reader was reading their empty `EventReference` instead of `CustomFunctionName`). Cast checks reordered in `GetK2NodeLabel` and `DeriveK2NodeTypeAndContext` — CustomEvent first, then Event. If you've previously diagnosed Blueprints as having "cleared" CustomEvent names based on plugin queries, re-check after rebuilding — the names were likely fine and only the labels were wrong.
 
 ## Features
 
@@ -188,7 +199,7 @@ The `meta` domain is for maintaining the domain system itself:
 
 Over time your domains become a living knowledge base of your project — written by the AI based on what it actually encountered while working on your code. This is what makes the second, third, and hundredth session productive instead of starting from scratch every time.
 
-### CLI Wrapper — `ue-tool.sh`
+### CLI Wrapper — `ue-tool.sh` / `ue-tool.ps1`
 
 This is not a convenience script. It's a **core tooling layer** that sits between the LLM and the plugin HTTP API. Without it, every tool call costs the LLM tokens to construct a `curl` command, guess parameter names, parse raw JSON responses, and handle connection errors. With it, calls are one-liners and responses come back pre-formatted for LLM consumption.
 
@@ -199,7 +210,7 @@ What it does:
 - **`call <tool> '{...}'`** — handles connectivity checks, error formatting, and compact JSON output
 - **`save`** — save all dirty assets (one word instead of a JSON POST)
 - **`list`** — all available tools at a glance
-- **`--port`** — multi-editor support for staging workflows
+- **`--port` / `-Port`** — multi-editor support for staging workflows
 
 ```bash
 bash Scripts/ue-tool.sh list
@@ -208,9 +219,18 @@ bash Scripts/ue-tool.sh call asset_search '{"search_term":"Character"}'
 bash Scripts/ue-tool.sh save
 ```
 
+**PowerShell variant** (`Scripts/ue-tool.ps1`) is a Windows-native equivalent for environments without Python or a bash interpreter. Same five commands; output is structurally identical. The script is ASCII-only by design — PowerShell 5.1 reads scripts as Windows-1252 without a BOM, so non-ASCII characters (em-dashes, smart quotes) corrupt the parse. Editor lifecycle commands from the bash version (launch/close/restart) are intentionally not ported — start and stop the editor yourself, or extend the script.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File Scripts\ue-tool.ps1 list
+powershell -NoProfile -ExecutionPolicy Bypass -File Scripts\ue-tool.ps1 help blueprint_query
+powershell -NoProfile -ExecutionPolicy Bypass -File Scripts\ue-tool.ps1 call asset_search '{"search_term":"Character"}'
+powershell -NoProfile -ExecutionPolicy Bypass -File Scripts\ue-tool.ps1 save
+```
+
 ### Raw HTTP API
 
-If you're not using the CLI wrapper (heavily not recommended! please use ue-tool.sh), all tools are available via `POST /mcp/tool/<tool_name>` with a JSON body.
+If you're not using the CLI wrapper (heavily not recommended! please use ue-tool.ps1), all tools are available via `POST /mcp/tool/<tool_name>` with a JSON body.
 
 ```bash
 # Query a Blueprint's event graph
@@ -338,7 +358,7 @@ If you need something that isn't covered, see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 - Unreal Engine 5.7
 - Windows (Win64) or Linux
-- Python 3.x (for CLI wrapper output formatting — optional)
+- Python 3.x (only required for `ue-tool.sh` output formatting — Windows users can use `ue-tool.ps1` instead and skip Python entirely)
 - Node.js 18+ (for MCP bridge — optional)
 
 ### Version Support
