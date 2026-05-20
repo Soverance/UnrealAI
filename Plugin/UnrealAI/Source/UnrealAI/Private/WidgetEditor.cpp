@@ -825,6 +825,16 @@ TSharedPtr<FJsonObject> FWidgetEditor::CreateWidgetBlueprint(const FString& Name
 // AddWidget
 // ============================================================================
 
+// UMG's designer registers each named widget in WidgetVariableNameToGuidMap and sets bIsVariable=true.
+// Without those two steps the compiled WidgetBP class has no member slot for the widget, the BP graph
+// can't reference it by name, and the compiler fires an ensure on every compile.
+static void RegisterWidgetAsVariable(UWidgetBlueprint* WBP, UWidget* Widget)
+{
+	if (!WBP || !Widget) return;
+	Widget->bIsVariable = true;
+	WBP->WidgetVariableNameToGuidMap.Add(Widget->GetFName(), FGuid::NewGuid());
+}
+
 TSharedPtr<FJsonObject> FWidgetEditor::AddWidget(UWidgetBlueprint* WBP, const FString& WidgetClass,
 	const FString& WidgetName, const FString& ParentName)
 {
@@ -877,6 +887,7 @@ TSharedPtr<FJsonObject> FWidgetEditor::AddWidget(UWidgetBlueprint* WBP, const FS
 		if (!WBP->WidgetTree->RootWidget)
 		{
 			WBP->WidgetTree->RootWidget = NewWidget;
+			RegisterWidgetAsVariable(WBP, NewWidget);
 
 			WBP->MarkPackageDirty();
 			FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(WBP);
@@ -901,6 +912,8 @@ TSharedPtr<FJsonObject> FWidgetEditor::AddWidget(UWidgetBlueprint* WBP, const FS
 		WBP->WidgetTree->RemoveWidget(NewWidget);
 		return ErrorResult(TEXT("AddChild returned null slot"));
 	}
+
+	RegisterWidgetAsVariable(WBP, NewWidget);
 
 	WBP->MarkPackageDirty();
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(WBP);
@@ -932,11 +945,14 @@ TSharedPtr<FJsonObject> FWidgetEditor::RemoveWidget(UWidgetBlueprint* WBP, const
 	}
 
 	FString WidgetClass = Widget->GetClass()->GetName();
+	FName WidgetFName = Widget->GetFName();
 	bool bRemoved = WBP->WidgetTree->RemoveWidget(Widget);
 	if (!bRemoved)
 	{
 		return ErrorResult(FString::Printf(TEXT("Failed to remove widget: %s"), *WidgetName));
 	}
+
+	WBP->WidgetVariableNameToGuidMap.Remove(WidgetFName);
 
 	WBP->MarkPackageDirty();
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(WBP);
@@ -1777,6 +1793,7 @@ static UWidget* CloneWidgetRecursive(UWidgetBlueprint* WBP, UWidget* Source, con
 	if (!Clone) return nullptr;
 
 	UEngine::CopyPropertiesForUnrelatedObjects(Source, Clone);
+	RegisterWidgetAsVariable(WBP, Clone);
 
 	UPanelWidget* SourcePanel = Cast<UPanelWidget>(Source);
 	UPanelWidget* ClonePanel = Cast<UPanelWidget>(Clone);
